@@ -41,6 +41,7 @@
 #include "touch.h"
 #include "uart.h"
 #include "light_control.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,13 +55,18 @@
 
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
-#define READ_TEMP_CYCLE 600 // 30s, because software timer2 cycle is 50ms
+#define READ_TEMP_CYCLE 	600 // 30s, because software timer2 cycle is 50ms
+#define WAIT_ESP_INIT		0
+#define SEND_TEMPERATURE	1
 
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
+uint8_t system_status = WAIT_ESP_INIT;
+uint8_t temperatureBytesArray[4];
+uint8_t roundedTemperature;
 
 /* USER CODE END PV */
 
@@ -126,14 +132,24 @@ int main(void)
   while (1)
   {
 	  // 50ms task
-	  if(flag_timer2 == 1)
+	  if(flag_timer2)
 	  {
 		  flag_timer2 = 0;
-//		  test_Esp();
-		  readTemperature();
-//		  lightProcess();
-		  button_Scan();
 		  test_LedDebug();
+		  switch (system_status)
+		  {
+		  case WAIT_ESP_INIT:
+			  if (GPIO_PIN_RESET == HAL_GPIO_ReadPin(ESP12_BUSY_GPIO_Port, ESP12_BUSY_Pin))
+			  {
+				  system_status = SEND_TEMPERATURE;
+			  }
+			  break;
+		  case SEND_TEMPERATURE:
+			  readTemperature();
+//			  uart_EspSendBytes(temperatureBytesArray, 4);
+			  uart_EspSendBytes(&roundedTemperature, 1);
+			  break;
+		  }
 	  }
 
     /* USER CODE END WHILE */
@@ -210,16 +226,16 @@ void test_LedDebug(){
 uint8_t timer_temperature_cnt = 0;
 void readTemperature() {
 	timer_temperature_cnt = (timer_temperature_cnt + 1) % READ_TEMP_CYCLE;
-	if (count_adc == 0){
+	if (timer_temperature_cnt == 0){
 		sensor_Read();
 		lcd_ShowStr(10, 180, "Temperature:", RED, BLACK, 16, 0);
 
+		// Send float temperature
 		float currentTemperature = sensor_GetTemperature();
-		uint8_t floatBytesArray[4];
+		memcpy(temperatureBytesArray, (uint8_t*)&currentTemperature, sizeof(float));
 
-//		uint8_t bytes[] = {'!'};
-//		uart_EspSendBytes("!", 1);
-//		uart_EspSendBytes(floatBytesArray, 4);
+		// Send rounded temperature
+		roundedTemperature = round(currentTemperature);
 
 		lcd_ShowFloatNum(130, 180,currentTemperature, 4, RED, BLACK, 16);
 	}

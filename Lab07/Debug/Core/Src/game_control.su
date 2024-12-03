@@ -1,0 +1,8 @@
+../Core/Src/game_control.c:19:6:gameFSM	16	static
+../Core/Src/game_control.c:77:6:initializeControlButtons	80	static
+../Core/Src/game_control.c:88:6:initializeButtons	24	static
+../Core/Src/game_control.c:93:9:isButtonUp	8	static
+../Core/Src/game_control.c:100:9:isButtonDown	8	static
+../Core/Src/game_control.c:107:9:isButtonLeft	8	static
+../Core/Src/game_control.c:114:9:isButtonRight	8	static
+../Core/Src/game_control.c:121:9:isStartScreenTouched	8	static

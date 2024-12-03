@@ -1,0 +1,8 @@
+../Core/Src/game_display.c:15:6:drawCell	1
+../Core/Src/game_display.c:19:6:renderScreen	5
+../Core/Src/game_display.c:33:6:generateFruit	2
+../Core/Src/game_display.c:40:6:initializeGame	1
+../Core/Src/game_display.c:55:6:advanceSnakeHead	5
+../Core/Src/game_display.c:65:6:removeSnakeTail	5
+../Core/Src/game_display.c:82:6:handleInput	13
+../Core/Src/game_display.c:95:6:displayStartScreen	1

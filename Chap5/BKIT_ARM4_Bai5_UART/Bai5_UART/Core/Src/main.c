@@ -50,6 +50,9 @@
 /* Private macro -------------------------------------------------------------*/
 /* USER CODE BEGIN PM */
 
+// Button Macros
+#define BTN_0_INDEX 		13
+
 // System modes
 #define NORMAL_MODE 		0
 #define REMOTE_UPDATE_TIME	1
@@ -60,7 +63,7 @@
 #define UPDATE_MINUTES		2
 #define WAIT_FOR_MINUTES	3
 #define UPDATE_SECONDS		4
-#define WAIT_FOR_SECONDS		5
+#define WAIT_FOR_SECONDS	5
  
 #define UART_TIMEOUT_CNT		200 // 10s, because software timer 2 cycle is 50ms
 #define UART_TIMEOUT_MAX_TRIES	3
@@ -145,7 +148,7 @@ int main(void) {
 			switch (system_status) {
 				case NORMAL_MODE:
 					// TODO: placeholder for button event for switch to remote update time mode
-					if (1) {
+					if (button_count[BTN_0_INDEX]) {
 						timeout_cnt = 0;
 						lcd_Clear(BLACK);
 						system_status = REMOTE_UPDATE_TIME;
@@ -156,7 +159,6 @@ int main(void) {
 					switch (remote_update_time_status) {
 						case UPDATE_HOURS:
 							uart_Rs232SendString("hours");
-							lcd_Clear(BLACK);
 							lcd_ShowStr(10, 20, "Updating hours...", GREEN, BLACK, 16, 0);
 							remote_update_time_status = WAIT_FOR_HOURS;
 							uart_timer_cnt = 0;
@@ -176,21 +178,30 @@ int main(void) {
 							} else {
 								if (uart_receive_flag) {
 									uart_receive_flag = 0;
-									uint8_t hour_received = 24;
+									uint8_t hour_received = 0;
+									uint8_t valid_format = 1;
 									// Get the latest data
 									while (uart_ring_buffer.length > 0) {
-										ringBufferPop(&uart_ring_buffer, &hour_received);
+										uint8_t received_char = 0;
+										ringBufferPop(&uart_ring_buffer, &received_char);
+										if (received_char > '9' || received_char < '0') {
+											valid_format = 0;
+										} else {
+											hour_received = hour_received * 10 + (received_char - '0');
+										}
 									}
 
 									// Check hour format
-									if (hour_received < 24) {
+									if (hour_received < 24 && valid_format) {
+										lcd_Clear(BLACK);
 										remote_update_time_status = UPDATE_MINUTES;
 										hour = hour_received;
 										timeout_cnt = 0;
 									} else {
 										remote_update_time_status = UPDATE_HOURS;
 										timeout_cnt = 0;
-										lcd_ShowStr(10, 100, "Wating format of hours, try again", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 100, "Wating format of hours", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 120, "Try again", RED, BLACK, 16, 0);
 									}
 								} else {
 									uart_timer_cnt++;
@@ -199,7 +210,6 @@ int main(void) {
 							break;
 						case UPDATE_MINUTES:
 							uart_Rs232SendString("minutes");
-							lcd_Clear(BLACK);
 							lcd_ShowStr(10, 20, "Updating minutes...", GREEN, BLACK, 16, 0);
 							remote_update_time_status = WAIT_FOR_MINUTES;
 							uart_timer_cnt = 0;
@@ -219,21 +229,30 @@ int main(void) {
 							} else {
 								if (uart_receive_flag) {
 									uart_receive_flag = 0;
-									uint8_t minute_received = 60;
+									uint8_t minute_received = 0;
+									uint8_t valid_format = 1;
 									// Get the latest data
 									while (uart_ring_buffer.length > 0) {
-										ringBufferPop(&uart_ring_buffer, &minute_received);
+										uint8_t received_char = 0;
+										ringBufferPop(&uart_ring_buffer, &received_char);
+										if (received_char > '9' || received_char < '0') {
+											valid_format = 0;
+										} else {
+											minute_received = minute_received * 10 + (received_char - '0');
+										}
 									}
 
 									// Check hour format
-									if (minute_received < 60) {
+									if (minute_received < 60 && valid_format) {
+										lcd_Clear(BLACK);
 										remote_update_time_status = UPDATE_SECONDS;
 										minute = minute_received;
 										timeout_cnt = 0;
 									} else {
 										remote_update_time_status = UPDATE_MINUTES;
 										timeout_cnt = 0;
-										lcd_ShowStr(10, 100, "Wating format of minutes, try again", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 100, "Wating format of minutes", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 120, "Try again", RED, BLACK, 16, 0);
 									}
 								} else {
 									uart_timer_cnt++;
@@ -242,7 +261,6 @@ int main(void) {
 							break;
 						case UPDATE_SECONDS:
 							uart_Rs232SendString("seconds");
-							lcd_Clear(BLACK);
 							lcd_ShowStr(10, 20, "Updating seconds...", GREEN, BLACK, 16, 0);
 							remote_update_time_status = WAIT_FOR_SECONDS;
 							uart_timer_cnt = 0;
@@ -262,22 +280,31 @@ int main(void) {
 							} else {
 								if (uart_receive_flag) {
 									uart_receive_flag = 0;
-									uint8_t second_received = 60;
+									uint8_t second_received = 0;
+									uint8_t valid_format = 1;
 									// Get the latest data
 									while (uart_ring_buffer.length > 0) {
-										ringBufferPop(&uart_ring_buffer, &second_received);
+										uint8_t received_char = 0;
+										ringBufferPop(&uart_ring_buffer, &received_char);
+										if (received_char > '9' || received_char < '0') {
+											valid_format = 0;
+										} else {
+											second_received = second_received * 10 + (received_char - '0');
+										}
 									}
 
 									// Check hour format
-									if (second_received < 60) {
+									if (second_received < 60 && valid_format) {
 										system_status = NORMAL_MODE;
 										// TODO: update time to RTC
 										second = second_received;
+										lcd_Clear(BLACK);
 										lcd_ShowStr(10, 100, "Update time successfully", GREEN, BLACK, 16, 0);
 									} else {
 										remote_update_time_status = UPDATE_SECONDS;
 										timeout_cnt = 0;
-										lcd_ShowStr(10, 100, "Wating format of seconds, try again", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 100, "Wating format of seconds", RED, BLACK, 16, 0);
+										lcd_ShowStr(10, 120, "Try again", RED, BLACK, 16, 0);
 									}
 								} else {
 									uart_timer_cnt++;
@@ -346,6 +373,7 @@ void system_init() {
 	lcd_init();
 	uart_init_rs232();
 	setTimer2(50);
+	system_status = NORMAL_MODE;
 }
 
 uint16_t count_led_debug = 0;

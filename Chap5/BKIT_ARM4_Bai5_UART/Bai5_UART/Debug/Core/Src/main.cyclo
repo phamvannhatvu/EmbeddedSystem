@@ -1,7 +1,7 @@
-main.c:100:5:main	25
-main.c:301:6:SystemClock_Config	3
-main.c:339:6:system_init	1
-main.c:353:6:test_LedDebug	2
-main.c:360:6:test_button	3
-main.c:369:6:test_Uart	2
-main.c:385:6:Error_Handler	1
+main.c:103:5:main	35
+main.c:328:6:SystemClock_Config	3
+main.c:366:6:system_init	1
+main.c:381:6:test_LedDebug	2
+main.c:388:6:test_button	3
+main.c:397:6:test_Uart	2
+main.c:413:6:Error_Handler	1

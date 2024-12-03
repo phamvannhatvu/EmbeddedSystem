@@ -66,7 +66,8 @@
 /* USER CODE BEGIN PV */
 uint8_t system_status = WAIT_ESP_INIT;
 uint8_t temperatureBytesArray[4];
-uint8_t roundedTemperature;
+float currentTemperature;
+uint8_t temperatureTimerFlag = 0;
 
 /* USER CODE END PV */
 
@@ -146,8 +147,13 @@ int main(void)
 			  break;
 		  case SEND_TEMPERATURE:
 			  readTemperature();
-//			  uart_EspSendBytes(temperatureBytesArray, 4);
-			  uart_EspSendBytes(&roundedTemperature, 1);
+			  if (temperatureTimerFlag)
+			  {
+				  temperatureTimerFlag = 0;
+				  uint8_t command[30];
+				  sprintf(command, "!TEMP:%.2f#", currentTemperature);
+				  uart_EspSendBytes(command, strlen(command));
+			  }
 			  break;
 		  }
 	  }
@@ -227,15 +233,12 @@ uint8_t timer_temperature_cnt = 0;
 void readTemperature() {
 	timer_temperature_cnt = (timer_temperature_cnt + 1) % READ_TEMP_CYCLE;
 	if (timer_temperature_cnt == 0){
+		temperatureTimerFlag = 1;
 		sensor_Read();
 		lcd_ShowStr(10, 180, "Temperature:", RED, BLACK, 16, 0);
 
 		// Send float temperature
-		float currentTemperature = sensor_GetTemperature();
-		memcpy(temperatureBytesArray, (uint8_t*)&currentTemperature, sizeof(float));
-
-		// Send rounded temperature
-		roundedTemperature = round(currentTemperature);
+		currentTemperature = sensor_GetTemperature();
 
 		lcd_ShowFloatNum(130, 180,currentTemperature, 4, RED, BLACK, 16);
 	}

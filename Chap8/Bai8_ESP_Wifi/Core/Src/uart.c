@@ -64,7 +64,8 @@ void uart_init_esp(){
 }
 
 void uart_EspSendBytes(uint8_t* bytes, uint16_t size){
-	HAL_UART_Transmit(&huart2, bytes, size, 10);
+	HAL_UART_Transmit(&huart1, bytes, size, 10000);
+	HAL_UART_Transmit(&huart2, bytes, size, 10000);
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){

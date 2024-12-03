@@ -1,0 +1,8 @@
+../Core/Src/rs232_uart.c:26:10:mypow	24	static
+../Core/Src/rs232_uart.c:40:6:initRS232	8	static
+../Core/Src/rs232_uart.c:53:6:rs232SendString	16	static
+../Core/Src/rs232_uart.c:64:6:rs232SendBytes	16	static
+../Core/Src/rs232_uart.c:74:6:rs232SendNum	24	static
+../Core/Src/rs232_uart.c:110:6:rs232SendNumPercent	16	static
+../Core/Src/rs232_uart.c:125:6:HAL_UART_RxCpltCallback	16	static
+../Core/Src/rs232_uart.c:140:6:rs232GetFlag	4	static

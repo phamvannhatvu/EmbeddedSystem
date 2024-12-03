@@ -1,0 +1,2 @@
+../Core/Src/buzzer.c:7:6:buzzer_init	1
+../Core/Src/buzzer.c:11:6:buzzer_SetVolume	1

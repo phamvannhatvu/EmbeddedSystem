@@ -1,0 +1,8 @@
+../Core/Src/game_control.c:19:6:gameFSM	19
+../Core/Src/game_control.c:77:6:initializeControlButtons	2
+../Core/Src/game_control.c:88:6:initializeButtons	1
+../Core/Src/game_control.c:93:9:isButtonUp	6
+../Core/Src/game_control.c:100:9:isButtonDown	6
+../Core/Src/game_control.c:107:9:isButtonLeft	6
+../Core/Src/game_control.c:114:9:isButtonRight	6
+../Core/Src/game_control.c:121:9:isStartScreenTouched	6

@@ -3310,7 +3310,6 @@ int main(void)
  8002188:	4638      	mov	r0, r7
  800218a:	490f      	ldr	r1, [pc, #60]	; (80021c8 <main+0xdc>)
  800218c:	f006 fa7c 	bl	8008688 <siprintf>
-	//			  uart_EspSendBytes(temperatureBytesArray, 4);
 				  uart_EspSendBytes(command, strlen(command));
  8002190:	463b      	mov	r3, r7
  8002192:	4618      	mov	r0, r3
@@ -3545,14 +3544,14 @@ void test_LedDebug(){
 
 0800230c <readTemperature>:
 
-uint8_t timer_temperature_cnt = 0;
+uint16_t timer_temperature_cnt = 0;
 void readTemperature() {
  800230c:	b580      	push	{r7, lr}
  800230e:	b084      	sub	sp, #16
  8002310:	af04      	add	r7, sp, #16
 	timer_temperature_cnt = (timer_temperature_cnt + 1) % READ_TEMP_CYCLE;
  8002312:	4b20      	ldr	r3, [pc, #128]	; (8002394 <readTemperature+0x88>)
- 8002314:	781b      	ldrb	r3, [r3, #0]
+ 8002314:	881b      	ldrh	r3, [r3, #0]
  8002316:	3301      	adds	r3, #1
  8002318:	4a1f      	ldr	r2, [pc, #124]	; (8002398 <readTemperature+0x8c>)
  800231a:	fb82 1203 	smull	r1, r2, r2, r3
@@ -3562,12 +3561,12 @@ void readTemperature() {
  8002324:	f44f 7116 	mov.w	r1, #600	; 0x258
  8002328:	fb01 f202 	mul.w	r2, r1, r2
  800232c:	1a9a      	subs	r2, r3, r2
- 800232e:	b2d2      	uxtb	r2, r2
+ 800232e:	b292      	uxth	r2, r2
  8002330:	4b18      	ldr	r3, [pc, #96]	; (8002394 <readTemperature+0x88>)
- 8002332:	701a      	strb	r2, [r3, #0]
+ 8002332:	801a      	strh	r2, [r3, #0]
 	if (timer_temperature_cnt == 0){
  8002334:	4b17      	ldr	r3, [pc, #92]	; (8002394 <readTemperature+0x88>)
- 8002336:	781b      	ldrb	r3, [r3, #0]
+ 8002336:	881b      	ldrh	r3, [r3, #0]
  8002338:	2b00      	cmp	r3, #0
  800233a:	d128      	bne.n	800238e <readTemperature+0x82>
 		temperatureTimerFlag = 1;

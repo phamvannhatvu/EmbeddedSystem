@@ -8079,9 +8079,8 @@ LOAD d:/programs/stm32cubeide_1.12.0/stm32cubeide/plugins/com.st.stm32cube.ide.m
                 0x0000000020000369        0x1 ./Core/Src/main.o
                 0x0000000020000369                count_led_debug
  .bss.timer_temperature_cnt
-                0x000000002000036a        0x1 ./Core/Src/main.o
+                0x000000002000036a        0x2 ./Core/Src/main.o
                 0x000000002000036a                timer_temperature_cnt
- *fill*         0x000000002000036b        0x1 
  .bss.adc_receive
                 0x000000002000036c        0xa ./Core/Src/sensor.o
                 0x000000002000036c                adc_receive

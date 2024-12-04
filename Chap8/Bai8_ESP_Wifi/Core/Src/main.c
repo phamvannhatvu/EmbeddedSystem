@@ -229,7 +229,7 @@ void test_LedDebug(){
 	}
 }
 
-uint8_t timer_temperature_cnt = 0;
+uint16_t timer_temperature_cnt = 0;
 void readTemperature() {
 	timer_temperature_cnt = (timer_temperature_cnt + 1) % READ_TEMP_CYCLE;
 	if (timer_temperature_cnt == 0){

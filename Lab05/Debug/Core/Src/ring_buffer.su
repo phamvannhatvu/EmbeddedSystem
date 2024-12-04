@@ -1,0 +1,4 @@
+../Core/Src/ring_buffer.c:10:6:ringBufferPush	16	static
+../Core/Src/ring_buffer.c:24:9:ringBufferPop	16	static
+../Core/Src/ring_buffer.c:36:9:ringBufferPeek	16	static
+../Core/Src/ring_buffer.c:46:9:isRingBufferEmpty	16	static

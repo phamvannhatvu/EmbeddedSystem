@@ -1,264 +1,196 @@
 
 
-#include "lcdFont.h"
 #include "lcd.h"
-#include "fsmc.h"
-
-#include <stdlib.h>
-#include <string.h>
-
-#ifdef __cplusplus
-extern "C"
-{
-#endif /* __cplusplus */
+#include "lcdfont.h"
 
 unsigned char s[50];
 
 _lcd_dev lcddev;
 
-static void LCD_WR_DATA(uint16_t data);
-static uint16_t LCD_RD_DATA(void);
-static uint32_t mypow(uint8_t m, uint8_t n);
-
-void LCD_WR_REG(uint16_t reg)
+void LCD_WR_REG(uint16_t reg) //
 {
-	LCD->LCD_REG = reg;
+	LCD->LCD_REG=reg;
 }
 
 void LCD_WR_DATA(uint16_t data)
 {
-	LCD->LCD_RAM = data;
+	LCD->LCD_RAM=data;
 }
 
 uint16_t LCD_RD_DATA(void)
 {
 	__IO uint16_t ram;
-	ram = LCD->LCD_RAM;
+	ram=LCD->LCD_RAM;
 	return ram;
 }
 
 
-void lcdSetAddress(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2)
+void lcd_AddressSet(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2)
 {
-	LCD_WR_REG(0x2a);
-	LCD_WR_DATA(x1 >> 8);
-	LCD_WR_DATA(x1 & 0xff);
-	LCD_WR_DATA(x2 >> 8);
-	LCD_WR_DATA(x2 & 0xff);
-	LCD_WR_REG(0x2b);
-	LCD_WR_DATA(y1 >> 8);
-	LCD_WR_DATA(y1 & 0xff);
-	LCD_WR_DATA(y2 >> 8);
-	LCD_WR_DATA(y2 & 0xff);
-	LCD_WR_REG(0x2c);
+		LCD_WR_REG(0x2a);
+		LCD_WR_DATA(x1>>8);
+		LCD_WR_DATA(x1&0xff);
+		LCD_WR_DATA(x2>>8);
+		LCD_WR_DATA(x2&0xff);
+		LCD_WR_REG(0x2b);
+		LCD_WR_DATA(y1>>8);
+		LCD_WR_DATA(y1&0xff);
+		LCD_WR_DATA(y2>>8);
+		LCD_WR_DATA(y2&0xff);
+		LCD_WR_REG(0x2c);
 }
 
-void lcdSetCursor(uint16_t x, uint16_t y)
+
+void lcd_SetCursor(uint16_t x,uint16_t y)
 {
 	LCD_WR_REG(0x2a);
-	LCD_WR_DATA(x >> 8);
-	LCD_WR_DATA(x & 0xff);
+	LCD_WR_DATA(x>>8);
+	LCD_WR_DATA(x&0xff);
 	LCD_WR_REG(0x2b);
-	LCD_WR_DATA(y >> 8);
-	LCD_WR_DATA(y & 0xff);
+	LCD_WR_DATA(y>>8);
+	LCD_WR_DATA(y&0xff);
 }
 
-void lcdSetDisplayOn(void)
+void lcd_DisplayOn(void)
 {
 	LCD_WR_REG(0X29);
 }
 
-void lcdSetDisplayOff(void)
+void lcd_DisplayOff(void)
 {
 	LCD_WR_REG(0X28);
 }
 
-uint16_t lcdReadPoint(uint16_t x, uint16_t y)
+uint16_t lcd_ReadPoint(uint16_t x,uint16_t y)
 {
-	uint16_t r = 0, g = 0, b = 0;
-	lcdSetCursor(x, y);
+ 	uint16_t r=0,g=0,b=0;
+	lcd_SetCursor(x,y);
 	LCD_WR_REG(0X2E);
-	r = LCD_RD_DATA();
-	r = LCD_RD_DATA();
-	b = LCD_RD_DATA();
-	g = r & 0XFF;
-	g <<= 8;
-	return (((r >> 11) << 11) | ((g >> 10) << 5) | (b >> 11));
+	r=LCD_RD_DATA();
+	r=LCD_RD_DATA();
+	b=LCD_RD_DATA();
+	g=r&0XFF;
+	g<<=8;
+	return (((r>>11)<<11)|((g>>10)<<5)|(b>>11));
 }
 
-/**
- * @brief  Fill all pixels with a color
- * @param  color Color to fill the screen
- * @retval None
- */
-void lcdClear(uint16_t color)
+
+void lcd_Clear(uint16_t color) //
 {
-	uint16_t i, j;
-	lcdSetAddress(0, 0, lcddev.width - 1, lcddev.height - 1);
-	for (i = 0; i < lcddev.width; i++)
+	uint16_t i,j;
+	uint8_t buffer[2];
+	buffer[0] = color >> 8;
+	buffer[1] = color;
+	lcd_AddressSet(0,0,lcddev.width-1,lcddev.height-1);
+	for(i=0;i<lcddev.width;i++)
 	{
-		for (j = 0; j < lcddev.height; j++)
+		for(j=0;j<lcddev.height;j++)
+		{
+			LCD_WR_DATA(color);
+//			sram_WriteBuffer(&buffer, (i*lcddev.width+j)*4, 2);
+		}
+	}
+}
+
+void lcd_Fill(uint16_t xsta,uint16_t ysta,uint16_t xend,uint16_t yend,uint16_t color) //add a hcn = 1 mau car been trogn
+{
+	uint16_t i,j;
+	lcd_AddressSet(xsta,ysta,xend-1,yend-1);
+	for(i=ysta;i<yend;i++)
+	{
+		for(j=xsta;j<xend;j++)
 		{
 			LCD_WR_DATA(color);
 		}
 	}
 }
 
-/**
- * @brief  Fill a group of pixels with a color
- * @param  xsta	Start column
- * @param  ysta	Start row
- * @param  xend	End column
- * @param  yend	End row
- * @param  color Color to fill
- * @retval None
- */
-void lcdFill(uint16_t xsta, uint16_t ysta, uint16_t xend, uint16_t yend,
-		uint16_t color)
+void lcd_DrawPoint(uint16_t x,uint16_t y,uint16_t color) // 1 ddieemr anhr
 {
-	uint16_t i, j;
-	lcdSetAddress(xsta, ysta, xend - 1, yend - 1);
-	for (i = ysta; i < yend; i++)
-	{
-		for (j = xsta; j < xend; j++)
-		{
-			LCD_WR_DATA(color);
-		}
-	}
-}
-
-/**
- * @brief  Fill 1 pixel with a color
- * @param  x X coordinate
- * @param  y Y coordinate
- * @param  color Color to fill
- * @retval None
- */
-void lcdDrawPoint(uint16_t x, uint16_t y, uint16_t color)
-{
-	lcdSetAddress(x, y, x, y);
+	lcd_AddressSet(x,y,x,y);//ÉèÖÃ¹â±êÎ»ÖÃ
 	LCD_WR_DATA(color);
 }
 
-/**
- * @brief  Draw a line with a color
- * @param  x1 X coordinate of start point
- * @param  y1 Y coordinate of start point
- * @param  x2 X coordinate of end point
- * @param  y2 Y coordinate of end point
- * @param  color Color to fill
- * @retval None
- */
-void lcdDrawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+void lcd_DrawLine(uint16_t x1,uint16_t y1,uint16_t x2,uint16_t y2,uint16_t color) // ve duong
 {
 	uint16_t t;
-	int xerr = 0, yerr = 0, delta_x, delta_y, distance;
-	int incx, incy, uRow, uCol;
-	delta_x = x2 - x1;
-	delta_y = y2 - y1;
-	uRow = x1;
-	uCol = y1;
-	if (delta_x > 0)
-		incx = 1;
-	else if (delta_x == 0)
-		incx = 0;
-	else
+	int xerr=0,yerr=0,delta_x,delta_y,distance;
+	int incx,incy,uRow,uCol;
+	delta_x=x2-x1;
+	delta_y=y2-y1;
+	uRow=x1;
+	uCol=y1;
+	if(delta_x>0)incx=1;
+	else if (delta_x==0)incx=0;
+	else {incx=-1;delta_x=-delta_x;}
+	if(delta_y>0)incy=1;
+	else if (delta_y==0)incy=0;
+	else {incy=-1;delta_y=-delta_y;}
+	if(delta_x>delta_y)distance=delta_x;
+	else distance=delta_y;
+	for(t=0;t<distance+1;t++)
 	{
-		incx = -1;
-		delta_x = -delta_x;
-	}
-	if (delta_y > 0)
-		incy = 1;
-	else if (delta_y == 0)
-		incy = 0;
-	else
-	{
-		incy = -1;
-		delta_y = -delta_y;
-	}
-	if (delta_x > delta_y)
-		distance = delta_x;
-	else
-		distance = delta_y;
-	for (t = 0; t < distance + 1; t++)
-	{
-		lcdDrawPoint(uRow, uCol, color);
-		xerr += delta_x;
-		yerr += delta_y;
-		if (xerr > distance)
+		lcd_DrawPoint(uRow,uCol,color);
+		xerr+=delta_x;
+		yerr+=delta_y;
+		if(xerr>distance)
 		{
-			xerr -= distance;
-			uRow += incx;
+			xerr-=distance;
+			uRow+=incx;
 		}
-		if (yerr > distance)
+		if(yerr>distance)
 		{
-			yerr -= distance;
-			uCol += incy;
+			yerr-=distance;
+			uCol+=incy;
 		}
 	}
 }
 
-void lcdDrawRect(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color)
+
+void lcd_DrawRectangle(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2,uint16_t color) // ve hcn(vien
 {
-	lcdDrawLine(x1, y1, x2, y1, color);
-	lcdDrawLine(x1, y1, x1, y2, color);
-	lcdDrawLine(x1, y2, x2, y2, color);
-	lcdDrawLine(x2, y1, x2, y2, color);
+	lcd_DrawLine(x1,y1,x2,y1,color);
+	lcd_DrawLine(x1,y1,x1,y2,color);
+	lcd_DrawLine(x1,y2,x2,y2,color);
+	lcd_DrawLine(x2,y1,x2,y2,color);
 }
 
-/**
- * @param x horizontal starting position for drawing the character
- * @param y vertical starting position for drawing the character
- * @param character ASCII value of the character to be displayed
- * @param fc foreground color of the character
- * @param bc background color of the character
- * @param sizey height (16, 24, 32) of the character in pixels (sizex is typically half the height)
- * @param mode determine whether the background color is applied
- * (!= 0 only the foreground color pixels, skipping the background)
- */
-void lcdShowChar(uint16_t x, uint16_t y, uint8_t character, uint16_t fc, uint16_t bc, uint8_t sizey, uint8_t mode)
+void lcd_ShowChar(uint16_t x,uint16_t y,uint8_t num,uint16_t fc,uint16_t bc,uint8_t sizey,uint8_t mode) // 1ky tu size = 12 16 24 32, fc: mau chuw, bc, mauf neefn, mode: hien neen
 {
-	uint8_t temp, sizex, t, m = 0;
-	uint16_t i, TypefaceNum;
-	uint16_t x0 = x;
-	sizex = sizey / 2;
-	TypefaceNum = (sizex / 8 + ((sizex % 8) ? 1 : 0)) * sizey;
-	character = character - ' ';
-	lcdSetAddress(x, y, x + sizex - 1, y + sizey - 1);
-	for (i = 0; i < TypefaceNum; i++)
+	uint8_t temp,sizex,t,m=0;
+	uint16_t i,TypefaceNum;
+	uint16_t x0=x;
+	sizex=sizey/2;
+	TypefaceNum=(sizex/8+((sizex%8)?1:0))*sizey;
+	num=num-' ';
+	lcd_AddressSet(x,y,x+sizex-1,y+sizey-1);
+	for(i=0;i<TypefaceNum;i++)
 	{
-		if (sizey == 12)
-			;
-		else if (sizey == 16)
-			temp = ascii_1608[character][i];
-		else if (sizey == 24)
-			temp = ascii_2412[character][i];
-		else if (sizey == 32)
-			temp = ascii_3216[character][i];
-		else
-			return;
-		for (t = 0; t < 8; t++)
+		if(sizey==12);
+		else if(sizey==16)temp=ascii_1608[num][i];
+		else if(sizey==24)temp=ascii_2412[num][i];
+		else if(sizey==32)temp=ascii_3216[num][i];
+		else return;
+		for(t=0;t<8;t++)
 		{
-			if (!mode) {
-				if (temp & (0x01 << t))
-					LCD_WR_DATA(fc);
-				else
-					LCD_WR_DATA(bc);
+			if(!mode)
+			{
+				if(temp&(0x01<<t))LCD_WR_DATA(fc);
+				else LCD_WR_DATA(bc);
 				m++;
-				if (m % sizex == 0)
+				if(m%sizex==0)
 				{
-					m = 0;
+					m=0;
 					break;
 				}
 			}
 			else
 			{
-				if (temp & (0x01 << t))
-					lcdDrawPoint(x, y, fc);
+				if(temp&(0x01<<t))lcd_DrawPoint(x,y,fc);
 				x++;
-				if ((x - x0) == sizex)
+				if((x-x0)==sizex)
 				{
-					x = x0;
+					x=x0;
 					y++;
 					break;
 				}
@@ -267,136 +199,100 @@ void lcdShowChar(uint16_t x, uint16_t y, uint8_t character, uint16_t fc, uint16_
 	}
 }
 
-uint32_t mypow(uint8_t m, uint8_t n)
+uint32_t mypow(uint8_t m,uint8_t n)
 {
-	uint32_t result = 1;
-	while (n--)
-		result *= m;
+	uint32_t result=1;
+	while(n--)result*=m;
 	return result;
 }
 
-/**
- * @param x, y coordinate that the number start
- * @param num number to be displayed on the LCD
- * @param len The length of the number to be displayed
- * @param fc color of the digits
- * @param bc background color used behind the digits
- * @param sizey height (16, 24, 32) font size used for displaying the digits
- * @param mode determine whether the background color is applied
- * (!= 0 only the foreground color pixels, skipping the background)
- */
-void lcdShowIntNum(uint16_t x, uint16_t y, uint16_t num, uint8_t len,
-		uint16_t fc, uint16_t bc, uint8_t sizey, uint8_t mode)
+void lcd_ShowIntNum(uint16_t x,uint16_t y,uint16_t num,uint8_t len,uint16_t fc,uint16_t bc,uint8_t sizey) //len: ddooj daif cuar so
 {
-	uint8_t t, temp;
-	uint8_t enshow = 0;
-	uint8_t sizex = sizey / 2;
-	for (t = 0; t < len; t++) {
-		temp = (num / mypow(10, len - t - 1)) % 10;
-		if (enshow == 0 && t < (len - 1)) {
-			if (temp == 0) {
-				lcdShowChar(x + t * sizex, y, '0', fc, bc, sizey, mode); // modify which symbol to display in blank space
+	uint8_t t,temp;
+	uint8_t enshow=0;
+	uint8_t sizex=sizey/2;
+	for(t=0;t<len;t++)
+	{
+		temp=(num/mypow(10,len-t-1))%10;
+		if(enshow==0&&t<(len-1))
+		{
+			if(temp==0)
+			{
+				lcd_ShowChar(x+t*sizex,y,' ',fc,bc,sizey,0);
 				continue;
-			}
-			else
-				enshow = 1;
+			}else enshow=1;
+
 		}
-		lcdShowChar(x + t * sizex, y, temp + 48, fc, bc, sizey, mode);
+	 	lcd_ShowChar(x+t*sizex,y,temp+48,fc,bc,sizey,0);
 	}
 }
-void lcdShowIntNumCenter(uint16_t x, uint16_t y, uint16_t num, uint8_t len,
-		uint16_t fc, uint16_t bc, uint8_t sizey, uint8_t mode)
-{
-    uint8_t t, temp;
-    uint8_t enshow = 0;
-    uint8_t sizex = sizey / 2;
-    uint16_t total_width = len * sizex;
-    uint16_t start_x = x - (total_width / 2);
-    uint16_t start_y = y - (sizey / 2);
 
-    for (t = 0; t < len; t++)
-    {
-        temp = (num / mypow(10, len - t - 1)) % 10;
-        if (enshow == 0 && t < (len - 1))
-        {
-            if (temp == 0)
-            {
-                lcdShowChar(start_x + t * sizex, start_y, '0', fc, bc, sizey, mode); // Display '0' instead of blank space
-                continue;
-            }
-            else
-                enshow = 1;
-        }
-        lcdShowChar(start_x + t * sizex, start_y, temp + 48, fc, bc, sizey, mode);
-    }
-}
 
-void lcdShowFloatNum(uint16_t x, uint16_t y, float num, uint8_t len,
-		uint16_t fc, uint16_t bc, uint8_t sizey, uint8_t mode)
+void lcd_ShowFloatNum1(uint16_t x,uint16_t y,float num,uint8_t len,uint16_t fc,uint16_t bc,uint8_t sizey)
 {
-	uint8_t t, temp, sizex;
+	uint8_t t,temp,sizex;
 	uint16_t num1;
-	sizex = sizey / 2;
-	num1 = num * 100;
-	for (t = 0; t < len; t++)
+	sizex=sizey/2;
+	num1=num*100;
+	for(t=0;t<len;t++)
 	{
-		temp = (num1 / mypow(10, len - t - 1)) % 10;
-		if (t == (len - 2))
+		temp=(num1/mypow(10,len-t-1))%10;
+		if(t==(len-2))
 		{
-			lcdShowChar(x + (len - 2) * sizex, y, '.', fc, bc, sizey, mode);
+			lcd_ShowChar(x+(len-2)*sizex,y,'.',fc,bc,sizey,0);
 			t++;
-			len += 1;
+			len+=1;
 		}
-		lcdShowChar(x + t * sizex, y, temp + 48, fc, bc, sizey, mode);
+	 	lcd_ShowChar(x+t*sizex,y,temp+48,fc,bc,sizey,0);
 	}
 }
 
-void lcdShowPicture(uint16_t x, uint16_t y, uint16_t length, uint16_t width,
-		const uint8_t pic[])
+void lcd_ShowPicture(uint16_t x,uint16_t y,uint16_t length,uint16_t width,const uint8_t pic[]) //code of picture
 {
-	uint8_t picH, picL;
-	uint16_t i, j;
-	uint32_t k = 0;
-	lcdSetAddress(x, y, x + length - 1, y + width - 1);
-	for (i = 0; i < length; i++)
+	uint8_t picH,picL;
+	uint16_t i,j;
+	uint32_t k=0;
+	lcd_AddressSet(x,y,x+length-1,y+width-1);
+	for(i=0;i<length;i++)
 	{
-		for (j = 0; j < width; j++)
+		for(j=0;j<width;j++)
 		{
-			picH = pic[k * 2];
-			picL = pic[k * 2 + 1];
-			LCD_WR_DATA(picH << 8 | picL);
+			picH=pic[k*2];
+			picL=pic[k*2+1];
+			LCD_WR_DATA(picH<<8|picL);
 			k++;
 		}
 	}
 }
 
-void lcdSetDirection(uint8_t dir)
+
+void lcd_SetDir(uint8_t dir) //chinh huong man hinh
 {
-	if ((dir >> 4) % 4)
+	if((dir>>4)%4)
 	{
-		lcddev.width = 320;
-		lcddev.height = 240;
-	}
-	else
+		lcddev.width=320;
+		lcddev.height=240;
+	}else
 	{
-		lcddev.width = 240;
-		lcddev.height = 320;
+		lcddev.width=240;
+		lcddev.height=320;
 	}
 }
 
-void initLCD(void)
+
+void lcd_init(void)
 {
 	HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_RESET);
 	HAL_Delay(500);
 	HAL_GPIO_WritePin(FSMC_RES_GPIO_Port, FSMC_RES_Pin, GPIO_PIN_SET);
 	HAL_Delay(500);
-	lcdSetDirection(DFT_SCAN_DIR);
+	lcd_SetDir(L2R_U2D);
 	LCD_WR_REG(0XD3);
-	lcddev.id = LCD_RD_DATA();
-	lcddev.id = LCD_RD_DATA();
-	lcddev.id = LCD_RD_DATA();
-	lcddev.id <<= 8;
-	lcddev.id |= LCD_RD_DATA();
+	lcddev.id=LCD_RD_DATA();	//dummy read
+	lcddev.id=LCD_RD_DATA();
+	lcddev.id=LCD_RD_DATA();
+	lcddev.id<<=8;
+	lcddev.id|=LCD_RD_DATA();
 
 	LCD_WR_REG(0xCF);
 	LCD_WR_DATA(0x00);
@@ -432,8 +328,9 @@ void initLCD(void)
 	LCD_WR_REG(0xC7);    //VCM control2
 	LCD_WR_DATA(0XB7);
 	LCD_WR_REG(0x36);    // Memory Access Control
+	LCD_WR_DATA(0x08|L2R_U2D);
 
-	LCD_WR_DATA(0x08 | DFT_SCAN_DIR);
+//	LCD_WR_DATA(0x08|DFT_SCAN_DIR);
 	LCD_WR_REG(0x3A);
 	LCD_WR_DATA(0x55);
 	LCD_WR_REG(0xB1);
@@ -488,72 +385,59 @@ void initLCD(void)
 	LCD_WR_DATA(0x00);
 	LCD_WR_DATA(0x00);
 	LCD_WR_DATA(0xef);
-	LCD_WR_REG(0x11); // Exit Sleep
+	LCD_WR_REG(0x11); //Exit Sleep
 	HAL_Delay(120);
-	LCD_WR_REG(0x29); // Display on
+	LCD_WR_REG(0x29); //display on
 	HAL_GPIO_WritePin(FSMC_BLK_GPIO_Port, FSMC_BLK_Pin, 1);
 }
 
-static void _draw_circle_8(int xc, int yc, int x, int y, uint16_t c)
+void _draw_circle_8(int xc, int yc, int x, int y, uint16_t c)
 {
-	lcdDrawPoint(xc + x, yc + y, c);
+	lcd_DrawPoint(xc + x, yc + y, c);
 
-	lcdDrawPoint(xc - x, yc + y, c);
+	lcd_DrawPoint(xc - x, yc + y, c);
 
-	lcdDrawPoint(xc + x, yc - y, c);
+	lcd_DrawPoint(xc + x, yc - y, c);
 
-	lcdDrawPoint(xc - x, yc - y, c);
+	lcd_DrawPoint(xc - x, yc - y, c);
 
-	lcdDrawPoint(xc + y, yc + x, c);
+	lcd_DrawPoint(xc + y, yc + x, c);
 
-	lcdDrawPoint(xc - y, yc + x, c);
+	lcd_DrawPoint(xc - y, yc + x, c);
 
-	lcdDrawPoint(xc + y, yc - x, c);
+	lcd_DrawPoint(xc + y, yc - x, c);
 
-	lcdDrawPoint(xc - y, yc - x, c);
+	lcd_DrawPoint(xc - y, yc - x, c);
 }
 
-/**
- * @param xc, yc Center coordinates of the circle (xc is horizontal direction)
- * @param c Color to be used for drawing the circle.
- * @param r radius of the circle
- * @param Boolean indicating whether to fill the circle (non-zero value) or just draw the outline (zero value).
- */
-void lcdDrawCircle(int xc, int yc, uint16_t c, int r, int fill)
+void lcd_DrawCircle(int xc, int yc,uint16_t c,int r, int fill) //ve duong or hinh, c: color
 {
 	int x = 0, y = r, yi, d;
 
 	d = 3 - 2 * r;
 
-	if (fill) {
-		while (x <= y)
-		{
+
+	if (fill)
+	{
+		while (x <= y) {
 			for (yi = x; yi <= y; yi++)
 				_draw_circle_8(xc, yc, x, yi, c);
 
-			if (d < 0)
-			{
+			if (d < 0) {
 				d = d + 4 * x + 6;
-			}
-			else
-			{
+			} else {
 				d = d + 4 * (x - y) + 10;
 				y--;
 			}
 			x++;
 		}
-	}
-	else
+	} else
 	{
-		while (x <= y)
-		{
+		while (x <= y) {
 			_draw_circle_8(xc, yc, x, y, c);
-			if (d < 0)
-			{
+			if (d < 0) {
 				d = d + 4 * x + 6;
-			}
-			else
-			{
+			} else {
 				d = d + 4 * (x - y) + 10;
 				y--;
 			}
@@ -562,86 +446,71 @@ void lcdDrawCircle(int xc, int yc, uint16_t c, int r, int fill)
 	}
 }
 
-/**
- * @param x x-coordinate where the string display.
- * @param y y-coordinate where the string display.
- * @param *str Pointer to the string that needs to be displayed
- * @param fc Foreground color of the text (font color)
- * @param bc Background color behind the text
- * @param sizey Height of the characters (can be 16, 24, 32)
- * @param mode determine whether the background color is applied
- * (!= 0 only the foreground color pixels, skipping the background)
- */
-void lcdShowString(uint16_t x, uint16_t y, char *str, uint16_t fc, uint16_t bc,
-		uint8_t sizey, uint8_t mode)
+void lcd_ShowStr(uint16_t x, uint16_t y,uint8_t *str,uint16_t fc, uint16_t bc,uint8_t sizey,uint8_t mode)
 {
-	uint16_t x0 = x;
-	uint8_t bHz = 0; // used to handle characters that are more than one byte long (e.g., Chinese characters)
-	while (*str != 0)
+	uint16_t x0=x;
+  uint8_t bHz=0;
+	while(*str!=0)
 	{
-		if (!bHz)
+		if(!bHz)
 		{
-			if (x > (lcddev.width - sizey / 2) || y > (lcddev.height - sizey))
-				return;
-			if (*str > 0x80)
-				bHz = 1;
+			if(x>(lcddev.width-sizey/2)||y>(lcddev.height-sizey)) return;
+			if(*str>0x80)bHz=1;
 			else
 			{
-				if (*str == 0x0D)
+				if(*str==0x0D)
 				{
-					y += sizey;
-					x = x0;
+					y+=sizey;
+					x=x0;
 					str++;
-				}
-				else
+				}else
 				{
-					lcdShowChar(x, y, *str, fc, bc, sizey, mode);
-					x += sizey / 2;
+					lcd_ShowChar(x,y,*str,fc,bc,sizey,mode);
+					x+=sizey/2;
 				}
-				str++;
+			  str++;
 			}
 		}
 	}
 }
-/**
- * @param x x-coordinate where the string should be centered.
- * @param y y-coordinate where the string should be centered.
- * @param *str Pointer to the string that needs to be displayed.
- * @param fc Foreground color of the text (font color).
- * @param bc Background color behind the text.
- * @param sizey Height of the characters (can be 16, 24, 32).
- * @param mode Determine whether the background color is applied
- * (!= 0 only the foreground color pixels, skipping the background).
- */
-void lcdShowStringCenter(uint16_t x, uint16_t y, char *str, uint16_t fc, uint16_t bc, uint8_t sizey, uint8_t mode) {
-    uint8_t sizex = sizey / 2;
-    uint16_t str_len = 0;
-    char *ptr = str;
 
-    // Calculate the length of the string
-    while (*ptr != '\0')
-    {
-        if (*ptr > 0x80)
-        {
-            // If the character is a multibyte character (e.g., Chinese character)
-            str_len += 2;
-            ptr++;
-        }
-        else
-        {
-            str_len++;
-        }
-        ptr++;
-    }
 
-    uint16_t total_width = str_len * sizex;
-    uint16_t start_x = x - (total_width / 2);
-    uint16_t start_y = y - (sizey / 2);
-
-    lcdShowString(start_x, start_y, str, fc, bc, sizey, mode);
+void lcd_StrCenter(uint16_t x, uint16_t y,uint8_t *str,uint16_t fc,uint16_t bc,uint8_t sizey,uint8_t mode)
+{
+	uint16_t len=strlen((const char *)str);
+	uint16_t x1=(lcddev.width-len*8)/2;
+	lcd_ShowStr(x+x1,y,str,fc,bc,sizey,mode);
+}
+void DrawTestPage(uint8_t *str)
+{
+	lcd_Fill(0,0,lcddev.width,20,BLUE);
+	lcd_Fill(0,lcddev.height-20,lcddev.width,lcddev.height,BLUE);
+	lcd_StrCenter(0,2,str,WHITE,BLUE,16,1);
+	lcd_StrCenter(0,lcddev.height-18,"Test page",WHITE,BLUE,16,1);
+	lcd_Fill(0,20,lcddev.width,lcddev.height-20,BLACK);
 }
 
+//void lcd_ShowBackground(){
+//	  DrawTestPage("Test Kit");
+//	  lcd_ShowPicture(0, 20, 240, 280, gImage_traffic);
+//}
 
-#ifdef __cplusplus
+void lcd_Display(){
+	uint16_t i,j;
+	uint8_t buffer[2];
+	uint16_t send;
+	lcd_AddressSet(0,0,lcddev.width-1,lcddev.height-1);//ÉèÖÃÏÔÊ¾·¶Î§
+	for(i=0;i<lcddev.width;i++)
+	{
+		for(j=0;j<lcddev.height;j++)
+		{
+//			sram_ReadBuffer(buffer, (i*lcddev.width+j)*4, 2);
+//			sram_ReadBuffer(&buffer[1], (i*lcddev.width+j+1)*4, 1);
+//			send = buffer[0];
+//			send = send << 8;
+//			send |= buffer[1];
+			LCD_WR_DATA(send);
+		}
+	}
 }
-#endif /* __cplusplus */
+

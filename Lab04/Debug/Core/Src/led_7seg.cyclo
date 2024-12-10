@@ -1,0 +1,6 @@
+../Core/Src/led_7seg.c:10:6:led7_init	1
+../Core/Src/led_7seg.c:14:6:led7_Scan	5
+../Core/Src/led_7seg.c:43:6:led7_SetDigit	3
+../Core/Src/led_7seg.c:49:6:led7_SetColon	2
+../Core/Src/led_7seg.c:54:6:led_On	3
+../Core/Src/led_7seg.c:60:6:led_Off	3

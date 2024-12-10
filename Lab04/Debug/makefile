@@ -34,37 +34,34 @@ $(wildcard ../makefile.init) \
 $(wildcard ../makefile.targets) \
 
 
-BUILD_ARTIFACT_NAME := lab4
+BUILD_ARTIFACT_NAME := Bai4_I2C_Realtimeclock
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX :=
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-lab4.elf \
+Bai4_I2C_Realtimeclock.elf \
 
 MAP_FILES += \
-lab4.map \
+Bai4_I2C_Realtimeclock.map \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-lab4.list \
-
-OBJCOPY_HEX += \
-lab4.hex \
+Bai4_I2C_Realtimeclock.list \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: lab4.elf secondary-outputs
+main-build: Bai4_I2C_Realtimeclock.elf secondary-outputs
 
 # Tool invocations
-lab4.elf lab4.map: $(OBJS) $(USER_OBJS) C:\Users\84334\OneDrive\Desktop\IC\ Basic\ Design\BKIT-lab4-main\BKIT-lab4-main\STM32\STM32F407ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "lab4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\84334\OneDrive\Desktop\IC Basic Design\BKIT-lab4-main\BKIT-lab4-main\STM32\STM32F407ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="lab4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Bai4_I2C_Realtimeclock.elf Bai4_I2C_Realtimeclock.map: $(OBJS) $(USER_OBJS) C:\Users\84334\OneDrive\Desktop\HTN_Lab4-main\HTN_Lab4-main\Bai4_I2C_Realtimeclock\STM32F407ZGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "Bai4_I2C_Realtimeclock.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\84334\OneDrive\Desktop\HTN_Lab4-main\HTN_Lab4-main\Bai4_I2C_Realtimeclock\STM32F407ZGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Bai4_I2C_Realtimeclock.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -73,22 +70,17 @@ default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-lab4.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "lab4.list"
-	@echo 'Finished building: $@'
-	@echo ' '
-
-lab4.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "lab4.hex"
+Bai4_I2C_Realtimeclock.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Bai4_I2C_Realtimeclock.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
 # Other Targets
 clean:
-	-$(RM) default.size.stdout lab4.elf lab4.hex lab4.list lab4.map
+	-$(RM) Bai4_I2C_Realtimeclock.elf Bai4_I2C_Realtimeclock.list Bai4_I2C_Realtimeclock.map default.size.stdout
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

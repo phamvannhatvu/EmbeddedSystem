@@ -7,12 +7,13 @@
   ******************************************************************************
   * @attention
   *
-  * Copyright (c) 2024 STMicroelectronics.
-  * All rights reserved.
+  * <h2><center>&copy; Copyright (c) 2023 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -57,12 +58,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define LED_DEBUG_Pin GPIO_PIN_4
-#define LED_DEBUG_GPIO_Port GPIOE
-#define LED_Y0_Pin GPIO_PIN_5
-#define LED_Y0_GPIO_Port GPIOE
-#define LED_Y1_Pin GPIO_PIN_6
-#define LED_Y1_GPIO_Port GPIOE
+#define DEBUG_LED_Pin GPIO_PIN_4
+#define DEBUG_LED_GPIO_Port GPIOE
+#define OUTPUT_Y0_Pin GPIO_PIN_5
+#define OUTPUT_Y0_GPIO_Port GPIOE
+#define OUTPUT_Y1_Pin GPIO_PIN_6
+#define OUTPUT_Y1_GPIO_Port GPIOE
 #define FSMC_RES_Pin GPIO_PIN_13
 #define FSMC_RES_GPIO_Port GPIOC
 #define INPUT_X0_Pin GPIO_PIN_6

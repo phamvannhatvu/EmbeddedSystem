@@ -1,4 +1,0 @@
-ring_buffer.c:10:6:ringBufferPush	3
-ring_buffer.c:24:9:ringBufferPop	2
-ring_buffer.c:36:9:ringBufferPeek	2
-ring_buffer.c:46:9:isRingBufferEmpty	1

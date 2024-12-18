@@ -1,5 +1,0 @@
-dataStructure.c:14:6:initRBuffer	1
-dataStructure.c:20:6:RBufferIsEmpty	1
-dataStructure.c:25:6:RBufferIsFull	1
-dataStructure.c:36:6:RBufferInsert	2
-dataStructure.c:54:6:RBufferRead	2

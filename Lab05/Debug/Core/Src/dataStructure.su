@@ -1,5 +1,0 @@
-../Core/Src/dataStructure.c:14:6:initRBuffer	16	static
-../Core/Src/dataStructure.c:20:6:RBufferIsEmpty	16	static
-../Core/Src/dataStructure.c:25:6:RBufferIsFull	16	static
-../Core/Src/dataStructure.c:36:6:RBufferInsert	16	static
-../Core/Src/dataStructure.c:54:6:RBufferRead	16	static

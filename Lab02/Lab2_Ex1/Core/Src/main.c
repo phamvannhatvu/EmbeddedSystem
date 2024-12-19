@@ -173,7 +173,7 @@ uint8_t count_led_Y0 = 0;
 uint8_t count_led_Y1 = 0;
 
 void test_LedDebug(){
-	count_led_debug = (count_led_debug + 1) % 20;
+	count_led_debug = (count_led_debug + 1) % 40;
 	if(count_led_debug == 0){
 		HAL_GPIO_TogglePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin);
 	}

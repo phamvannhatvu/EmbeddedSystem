@@ -114,7 +114,7 @@ int main(void)
         HAL_GPIO_WritePin(DEBUG_LED_GPIO_Port, DEBUG_LED_Pin, GPIO_PIN_RESET);
         if(cycleCounter == OFF_CYCLE + 1) {
           currentState = LED_STATE_ON;
-          cycleCounter = 1;
+          cycleCounter = 0;
         }
         break;
       default:

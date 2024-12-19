@@ -10,7 +10,8 @@ uint8_t led7seg[4] = {0, 1, 2, 3}; //4 index
 uint8_t arrayOfNum[10] = {0x03, 0x9f, 0x25, 0x0d, 0x99, 0x49, 0x41, 0x1f, 0x01, 0x09};// 9 numbers
 uint16_t spi_buffer = 0xffff;
 uint16_t led7_index = 0;
-uint8_t led7_state[4] = {GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PIN_RESET};
+uint8_t led7_state = GPIO_PIN_SET;
+uint8_t mode_counter = 0;
 
 /**
   * @brief  Init led 7 segment
@@ -19,10 +20,12 @@ uint8_t led7_state[4] = {GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PIN_RESET, GPIO_PI
   */
 void led7_init(){
 	  HAL_GPIO_WritePin(LD_LATCH_GPIO_Port, LD_LATCH_Pin, 1);
+	  led7_state = GPIO_PIN_SET;
 	  led_On(0);
 	  led_On(1);
 	  led_On(2);
 	  led_On(3);
+	  mode_counter = 0;
 }
 
 /**
@@ -34,6 +37,7 @@ void led7_init(){
 void led7_Scan(){
 	spi_buffer &= 0x00ff;
 	spi_buffer |= led7seg[led7_index] << 8;
+
 	switch(led7_index){
 	case 0:
 		spi_buffer |= 0x00b0;
@@ -59,7 +63,9 @@ void led7_Scan(){
 	HAL_SPI_Transmit(&hspi1, (void*)&spi_buffer, 2, 1);
 	HAL_GPIO_WritePin(LD_LATCH_GPIO_Port, LD_LATCH_Pin, 1);
 }
+void toggle_led7seg(){
 
+}
 /**
   * @brief  Display a digit at a position of led 7-segment
   * @param  num	Number displayed
@@ -99,7 +105,6 @@ void led_On(uint8_t index){
 	if(index >= 6 && index <=8){
 		spi_buffer |= 1 << (index-6);
 	}
-	led7_state[index] = GPIO_PIN_SET;
 }
 
 /**
@@ -115,12 +120,4 @@ void led_Off(uint8_t index){
 	if(index >= 6 && index <=8){
 		spi_buffer &= ~(1 << (index-6));
 	}
-	led7_state[index] = GPIO_PIN_RESET;
-}
-
-void toggle_led7seg(uint8_t index){
-	if(led7_state[index] == GPIO_PIN_RESET)
-		led_On(index);
-	else
-		led_Off(index);
 }

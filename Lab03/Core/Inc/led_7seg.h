@@ -17,6 +17,6 @@ void led7_SetColon(uint8_t status);
 
 void led_On(uint8_t index);
 void led_Off(uint8_t index);
-void toggle_led7seg(uint8_t index);
+void toggle_led7seg();
 
 #endif /* INC_LED7SEG_H_ */

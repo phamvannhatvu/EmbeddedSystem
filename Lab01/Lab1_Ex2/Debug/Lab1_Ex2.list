@@ -581,9 +581,9 @@ int main(void)
  800060e:	4b0e      	ldr	r3, [pc, #56]	; (8000648 <main+0x94>)
  8000610:	2200      	movs	r2, #0
  8000612:	701a      	strb	r2, [r3, #0]
-          cycleCounter = 1;
+          cycleCounter = 0;
  8000614:	4b0b      	ldr	r3, [pc, #44]	; (8000644 <main+0x90>)
- 8000616:	2201      	movs	r2, #1
+ 8000616:	2200      	movs	r2, #0
  8000618:	601a      	str	r2, [r3, #0]
         }
         break;

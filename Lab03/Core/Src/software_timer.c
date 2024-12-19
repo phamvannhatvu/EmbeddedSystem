@@ -12,7 +12,9 @@
 uint16_t flag_timer2 = 0;
 uint16_t timer2_counter = 0;
 uint16_t timer2_MUL = 0;
-uint16_t mode_counter = 0;
+
+// Enable the LED blinking
+uint8_t led7_status = 0;
 
 
 /**
@@ -53,7 +55,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 			}
 		}
 		// 1ms interrupt here
-		led7_Scan();
+		if(led7_status)
+			led7_Scan();
 	}
 }
 
+void set_led7(uint8_t status){
+	led7_status = status;
+}

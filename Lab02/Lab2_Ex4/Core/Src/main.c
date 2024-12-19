@@ -168,10 +168,10 @@ void system_init(){
 uint8_t count_led_debug = 0;
 uint8_t count_led_Y0 = 0;
 uint8_t count_led_Y1 = 0;
-// Start at 15:00
+// Modify this to fit with each testcase
 uint8_t cycle_counter = 0;
-uint8_t second_counter = 30;
-uint8_t minute_counter = 30;
+uint8_t second_counter = 50;
+uint8_t minute_counter = 59;
 uint8_t hour_counter = 15;
 
 void test_LedDebug(){

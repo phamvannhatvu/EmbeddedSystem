@@ -30,8 +30,13 @@ extern uint8_t current_mode;
 
 void traffic_light_init();
 void traffic_light_reset(uint8_t side, uint8_t color);
+
+// Finite state machine init
+void fsm_normal_init();
+void fsm_modify_init(uint8_t color);
 void fsm_normal(uint16_t system_timer);
 void fsm_modify_light(uint16_t system_timer, uint8_t color);
-void blink_edit_mode();
+
+
 
 #endif /* INC_TRAFFIC_LIGHT_H_ */

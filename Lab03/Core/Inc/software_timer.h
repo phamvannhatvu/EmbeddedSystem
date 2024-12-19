@@ -14,7 +14,7 @@
 #include "led_7seg.h"
 
 #define MODE_NORMAL_TICKS 20
-#define MODE_MODIFY_TICKS 5
+#define MODE_MODIFY_TICKS 10
 
 extern uint16_t flag_timer2;
 extern uint16_t mode_counter;

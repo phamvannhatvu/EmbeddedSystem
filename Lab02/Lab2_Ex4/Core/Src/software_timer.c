@@ -8,16 +8,14 @@
 #include "software_timer.h"
 
 #define TIMER_CYCLE_2 1
-#define TIMER_CYCLE_1Hz (1000 / (1 * 4))
-#define TIMER_CYCLE_25Hz (1000 / (25 * 4))
-#define TIMER_CYCLE_100Hz (1000 / (100 * 4))
+#define COLON_CYCLE_2Hz (1000 / (2))
 
 //software timer variable
 uint16_t flag_timer2 = 0;
 uint16_t timer2_counter = 0;
 uint16_t timer2_MUL = 0;
-uint16_t timer_modify_count = 0;
-
+uint8_t colon_blink 0;
+uint8_t colon_status = 0;
 /**
   * @brief  Init timer interrupt
   * @param  None
@@ -55,6 +53,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
 			}
 		}
 		led7_Scan();
+		if(colon_blink == 0){
+			colon_status = !colon_status;
+			led7_SetColon(colon_status);
+		}
 	}
 }
 
